@@ -1,0 +1,13 @@
+#list-type {
+  height: 100%;
+  border-right: 1px solid black;
+  padding: 16px 32px;
+  #list-type-title {
+    padding: 16px;
+    border-bottom: 1px solid black;
+  }
+}
+
+.active {
+  color: teal;
+}

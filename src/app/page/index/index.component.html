@@ -1,0 +1,407 @@
+<div class="jumbotron body">
+  <div>
+    <div class="container">
+      <app-nav-header></app-nav-header>
+      <div id="content">
+        <app-app-header></app-app-header>
+        <div class="row">
+          <div class="col-sm-12" id="list-content">
+            <div class="row">
+              <div class="col-sm-12">
+                <ul class="nav">
+                  <li
+                    class="nav-item"
+                    (click)="changeListType(1)"
+                    [class.active]="listType == 1"
+                  >
+                    <span class="nav-link"> Individual Search </span>
+                  </li>
+                  <li
+                    class="nav-item"
+                    (click)="changeListType(2)"
+                    [class.active]="listType == 2"
+                  >
+                    <span class="nav-link"> Bulk Search </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="input-group mb-6" id="search">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="keyword"
+                    aria-label="keyword"
+                    aria-describedby="basic-addon2"
+                    [(ngModel)]="keyword"
+                  />
+                  <div class="input-group-append">
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      (click)="filterByKeyword()"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="col-sm-3"
+                style="text-align: right"
+                *ngIf="listType == 2"
+              >
+                <button class="btn btn-outline-secondary">
+                  <a
+                    download="sample-individual.csv"
+                    href="../../resource/new.text"
+                    >Download file</a
+                  >
+                </button>
+              </div>
+              <div class="col-sm-3">
+                <input
+                  *ngIf="listType == 2"
+                  class="form-control"
+                  type="file"
+                  id="formFile"
+                  (change)="fileInput($event)"
+                  style="border: none"
+                />
+              </div>
+            </div>
+            <section style="padding: 16px" *ngIf="listType == 1">
+              <div class="row">
+                <div class="col-sm">
+                  <div class="input-group mb-3">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="jump to page"
+                      aria-label="jump to page"
+                      aria-describedby="basic-addon2"
+                      [(ngModel)]="page"
+                    />
+                    <div class="input-group-append">
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        (click)="jumpToPage()"
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm">
+                  <nav aria-label="...">
+                    <ul class="pagination">
+                      <li
+                        class="page-item"
+                        [class.disabled]="page <= 0"
+                        (click)="previousPage()"
+                      >
+                        <span class="page-link">Previous</span>
+                      </li>
+                      <li
+                        class="page-item"
+                        *ngIf="page > 0"
+                        (click)="triggerPage(page - 1)"
+                      >
+                        <span class="page-link">
+                          {{ page }}
+                        </span>
+                      </li>
+                      <li class="page-item active">
+                        <span class="page-link">
+                          {{ page + 1 }}
+                          <span class="sr-only">(current)</span>
+                        </span>
+                      </li>
+                      <li class="page-item" (click)="triggerPage(page + 1)">
+                        <span class="page-link">
+                          {{ page + 2 }}
+                        </span>
+                      </li>
+                      <li
+                        class="page-item"
+                        [class.disabled]="page >= totalPage"
+                        (click)="nextPage()"
+                      >
+                        <span class="page-link">Next</span>
+                      </li>
+                      <p style="margin: auto">of {{ totalPage }} pages</p>
+                    </ul>
+                  </nav>
+                </div>
+                <div class="col-sm">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01"
+                        >View Page Length</label
+                      >
+                    </div>
+                    <select
+                      class="custom-select"
+                      id="inputGroupSelect01"
+                      (change)="updateLength($event)"
+                    >
+                      <option value="10" selected>10</option>
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div id="list-table">
+              <section *ngIf="listType == 1">
+                <table
+                  class="table table-bordered table-striped table-hover"
+                  datatable
+                >
+                  <thead>
+                    <tr>
+                      <th colspan="1" scope="col">Data Id</th>
+                      <th colspan="1" scope="col">Name</th>
+                      <!-- <th colspan="1" scope="col">Second Name</th> -->
+                      <!-- <th colspan="1" scope="col">Third Name</th> -->
+                      <!-- <th colspan="1" scope="col">Fourth Name</th> -->
+                      <th colspan="2" scope="col">Date of Birth</th>
+                      <th colspan="2" scope="col">Individual Documents</th>
+                      <th colspan="2" scope="col">Alias</th>
+                    </tr>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col"></th>
+                      <!-- <th scope="col"></th> -->
+                      <!-- <th scope="col"></th> -->
+                      <!-- <th scope="col"></th> -->
+                      <th scope="col">Type</th>
+                      <th scope="col">Date</th>
+                      <th scope="col">Type</th>
+                      <th scope="col">Number</th>
+                      <th scope="col">Quality</th>
+                      <th scope="col">Alias</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let individual of unitedNationIndividuals">
+                      <th scope="row">{{ individual.dataId }}</th>
+                      <td>
+                        {{ individual.name }}
+                      </td>
+                      <!-- <td>{{ individual.secondName }}</td> -->
+                      <!-- <td>{{ individual.thirdName }}</td> -->
+                      <!-- <td>{{ individual.fourthName }}</td> -->
+                      <td>
+                        {{ individual.dateOfBirth.TYPE_OF_DATE }}
+                      </td>
+                      <td>{{ individual.dateOfBirth.DATE }}</td>
+                      <td>
+                        <ul
+                          *ngFor="
+                            let document of individual.individualDocuments
+                          "
+                        >
+                          <li>{{ document.TYPE_OF_DOCUMENT }}</li>
+                        </ul>
+                      </td>
+                      <td>
+                        <ul
+                          *ngFor="
+                            let document of individual.individualDocuments
+                          "
+                        >
+                          <li>{{ document.NUMBER }}</li>
+                        </ul>
+                      </td>
+                      <td>
+                        <ul *ngFor="let alias of individual.alias">
+                          <li>{{ alias.QUALITY }}</li>
+                        </ul>
+                      </td>
+                      <td>
+                        <ul *ngFor="let alias of individual.alias">
+                          <li>{{ alias.ALIAS_NAME }}</li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <section *ngIf="listType == 2">
+                <div id="accordion">
+                  <div
+                    class="card"
+                    *ngFor="
+                      let individual of unitedNationBulkIndividuals;
+                      let i = index
+                    "
+                  >
+                    <div class="card-header" id="headingOne">
+                      <h5 class="mb-0">
+                        <button
+                          class="btn btn-link"
+                          data-toggle="collapse"
+                          [attr.data-target]="'#heading' + i"
+                          aria-expanded="true"
+                          aria-controls="collapseOne"
+                        >
+                          {{ individual.originalSourceName }} -
+                          {{ individual.individuals.length }} record(s) found
+                        </button>
+                      </h5>
+                    </div>
+
+                    <div
+                      [attr.id]="'heading' + i"
+                      class="collapse"
+                      aria-labelledby="headingOne"
+                      data-parent="#accordion"
+                    >
+                      <div class="card-body">
+                        <table
+                          class="table table-bordered table-striped table-hover"
+                        >
+                          <thead>
+                            <tr>
+                              <th colspan="1" scope="col">Data Id</th>
+                              <th colspan="1" scope="col">Name</th>
+                              <!-- <th colspan="1" scope="col">Second Name</th> -->
+                              <!-- <th colspan="1" scope="col">Third Name</th> -->
+                              <!-- <th colspan="1" scope="col">Fourth Name</th> -->
+                              <th colspan="2" scope="col">Date of Birth</th>
+                              <th colspan="2" scope="col">
+                                Individual Documents
+                              </th>
+                              <th colspan="2" scope="col">Alias</th>
+                            </tr>
+                            <tr>
+                              <th scope="col"></th>
+                              <th scope="col"></th>
+                              <!-- <th scope="col"></th> -->
+                              <!-- <th scope="col"></th> -->
+                              <!-- <th scope="col"></th> -->
+                              <th scope="col">Type</th>
+                              <th scope="col">Date</th>
+                              <th scope="col">Type</th>
+                              <th scope="col">Number</th>
+                              <th scope="col">Quality</th>
+                              <th scope="col">Alias</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="let individual of individual.individuals"
+                            >
+                              <th scope="row">{{ individual.dataId }}</th>
+                              <td>
+                                {{ individual.name }}
+                              </td>
+                              <!-- <td>{{ individual.secondName }}</td> -->
+                              <!-- <td>{{ individual.thirdName }}</td> -->
+                              <!-- <td>{{ individual.fourthName }}</td> -->
+                              <td>
+                                {{ individual.dateOfBirth.TYPE_OF_DATE }}
+                              </td>
+                              <td>{{ individual.dateOfBirth.DATE }}</td>
+                              <td>
+                                <ul
+                                  *ngFor="
+                                    let document of individual.individualDocuments
+                                  "
+                                >
+                                  <li>{{ document.TYPE_OF_DOCUMENT }}</li>
+                                </ul>
+                              </td>
+                              <td>
+                                <ul
+                                  *ngFor="
+                                    let document of individual.individualDocuments
+                                  "
+                                >
+                                  <li>{{ document.NUMBER }}</li>
+                                </ul>
+                              </td>
+                              <td>
+                                <ul *ngFor="let alias of individual.alias">
+                                  <li>{{ alias.QUALITY }}</li>
+                                </ul>
+                              </td>
+                              <td>
+                                <ul *ngFor="let alias of individual.alias">
+                                  <li>{{ alias.ALIAS_NAME }}</li>
+                                </ul>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <section style="text-align: center" *ngIf="listType == 1">
+          <div class="row">
+            <div class="col-sm"></div>
+            <div class="col-sm">
+              <nav aria-label="...">
+                <ul class="pagination">
+                  <li
+                    class="page-item"
+                    [class.disabled]="page <= 0"
+                    (click)="previousPage()"
+                  >
+                    <span class="page-link">Previous</span>
+                  </li>
+                  <li
+                    class="page-item"
+                    *ngIf="page > 0"
+                    (click)="triggerPage(page - 1)"
+                  >
+                    <span class="page-link">
+                      {{ page }}
+                    </span>
+                  </li>
+                  <li class="page-item active">
+                    <span class="page-link">
+                      {{ page + 1 }}
+                      <span class="sr-only">(current)</span>
+                    </span>
+                  </li>
+                  <li class="page-item" (click)="triggerPage(page + 1)">
+                    <span class="page-link">
+                      {{ page + 2 }}
+                    </span>
+                  </li>
+                  <li
+                    class="page-item"
+                    [class.disabled]="page >= totalPage"
+                    (click)="nextPage()"
+                  >
+                    <span class="page-link">Next</span>
+                  </li>
+                  <p style="margin: auto">of {{ totalPage }} pages</p>
+                </ul>
+              </nav>
+            </div>
+            <div class="col-sm"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="container">
+      <app-nav-footer></app-nav-footer>
+    </div>
+  </div>
+</div>
